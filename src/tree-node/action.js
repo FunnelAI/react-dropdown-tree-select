@@ -26,8 +26,12 @@ class Action extends PureComponent {
     const { title, className, text, readOnly } = this.props
 
     return (
-      <i title={title} className={className} onClick={!readOnly ? this.handleClick : undefined}>
-        {text}
+      <i
+        title={title}
+        className={`${className} ${title ? 'tooltip' : ''}`}
+        onClick={!readOnly ? this.handleClick : undefined}
+      >
+        {text} <span className="tooltiptext">{title}</span>
       </i>
     )
   }
