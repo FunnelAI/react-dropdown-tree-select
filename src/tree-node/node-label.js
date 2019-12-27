@@ -25,12 +25,14 @@ class NodeLabel extends PureComponent {
     readOnly: PropTypes.bool,
     clientId: PropTypes.string,
     selectable: PropTypes.bool,
+    hint: PropTypes.string,
+    nodeMode: PropTypes.oneOf(['radioSelect']),
   }
 
   handleCheckboxChange = e => {
-    const { mode, id, onCheckboxChange } = this.props
+    const { mode, id, onCheckboxChange, nodeMode } = this.props
 
-    if (mode === 'simpleSelect' || mode === 'radioSelect') {
+    if (mode === 'simpleSelect' || mode === 'radioSelect' || nodeMode === 'radioSelect') {
       onCheckboxChange(id, true)
     } else {
       const {
@@ -43,9 +45,10 @@ class NodeLabel extends PureComponent {
   }
 
   render() {
-    const { mode, title, label, id, partial, checked, selectable = true } = this.props
+    const { mode, title, label, id, partial, checked, selectable = true, nodeMode } = this.props
     const { value, disabled, showPartiallySelected, readOnly, clientId } = this.props
-    const nodeLabelProps = { className: 'node-label' }
+    const { hint } = this.props
+    const nodeLabelProps = { className: `node-label ${hint ? 'tooltip' : ''}` }
     const labelProps = { className: selectable ? '' : 'not_selectable' }
     // in case of simple select mode, there is no checkbox, so we need to handle the click via the node label
     // but not if the control is in readOnly or disabled state
@@ -59,7 +62,19 @@ class NodeLabel extends PureComponent {
 
     return (
       <label title={title || label} htmlFor={id} {...labelProps}>
-        {mode === 'radioSelect' ? (
+        {selectable &&
+          (mode === 'radioSelect' || nodeMode === 'radioSelect' ? (
+            <RadioButton name={clientId} className="radio-item" onChange={this.handleCheckboxChange} {...sharedProps} />
+          ) : (
+            <Checkbox
+              name={id}
+              className={cx('checkbox-item', { 'simple-select': mode === 'simpleSelect' })}
+              indeterminate={showPartiallySelected && partial}
+              onChange={this.handleCheckboxChange}
+              {...sharedProps}
+            />
+          ))}
+        {/* {mode === 'radioSelect' ? (
           <RadioButton name={clientId} className="radio-item" onChange={this.handleCheckboxChange} {...sharedProps} />
         ) : (
           selectable && (
@@ -71,8 +86,11 @@ class NodeLabel extends PureComponent {
               {...sharedProps}
             />
           )
-        )}
-        <span {...nodeLabelProps}>{label}</span>
+        )} */}
+        <span {...nodeLabelProps}>
+          {label}
+          <span className="tooltiptext">{hint}</span>
+        </span>
       </label>
     )
   }
