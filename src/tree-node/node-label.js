@@ -27,6 +27,7 @@ class NodeLabel extends PureComponent {
     selectable: PropTypes.bool,
     hint: PropTypes.string,
     nodeMode: PropTypes.oneOf(['radioSelect']),
+    radioGroup: PropTypes.string,
   }
 
   handleCheckboxChange = e => {
@@ -44,9 +45,24 @@ class NodeLabel extends PureComponent {
     e.nativeEvent.stopImmediatePropagation()
   }
 
+  handleRadioButtonChange = e => {
+    const { id, onCheckboxChange } = this.props
+    const { target } = e
+    // has to be a radio button of the same group that is not checked:
+    const tagsToClose = document.querySelectorAll(`input[type='radio'][name='${target.name}']:not(:checked)`)
+    tagsToClose.forEach(tagToClose => {
+      const tagCloseButton = document.querySelector(`button#${tagToClose.id}_button.tag-remove`)
+      // if there is a result just close the tag from the close button
+      if (tagToClose && tagCloseButton) tagCloseButton.click()
+    })
+    // And create the new tag
+    onCheckboxChange(id, true)
+    e.stopPropagation()
+    e.nativeEvent.stopImmediatePropagation()
+  }
   render() {
     const { mode, title, label, id, partial, checked, selectable = true, nodeMode } = this.props
-    const { value, disabled, showPartiallySelected, readOnly, clientId } = this.props
+    const { value, disabled, showPartiallySelected, readOnly, clientId, radioGroup } = this.props
     const { hint } = this.props
     const nodeLabelProps = { className: `node-label ${hint ? 'tooltip' : ''}` }
     const labelProps = { className: selectable ? '' : 'not_selectable' }
@@ -64,7 +80,12 @@ class NodeLabel extends PureComponent {
       <label title={title || label} htmlFor={id} {...labelProps}>
         {selectable &&
           (mode === 'radioSelect' || nodeMode === 'radioSelect' ? (
-            <RadioButton name={clientId} className="radio-item" onChange={this.handleCheckboxChange} {...sharedProps} />
+            <RadioButton
+              name={radioGroup || clientId}
+              className="radio-item"
+              onChange={this.handleRadioButtonChange}
+              {...sharedProps}
+            />
           ) : (
             <Checkbox
               name={id}

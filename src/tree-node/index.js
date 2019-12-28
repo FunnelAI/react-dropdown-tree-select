@@ -76,6 +76,7 @@ class TreeNode extends PureComponent {
     selectable: PropTypes.bool,
     hint: PropTypes.string,
     nodeMode: PropTypes.oneOf(['radioSelect']),
+    radioGroup: PropTypes.string,
   }
 
   getAriaAttributes = () => {
@@ -119,6 +120,7 @@ class TreeNode extends PureComponent {
       selectable,
       hint,
       nodeMode,
+      radioGroup,
     } = this.props
     const liCx = getNodeCx(this.props)
     const style = keepTreeOnSearch || !searchModeOn ? { paddingLeft: `${(_depth || 0) * 20}px` } : {}
@@ -144,6 +146,7 @@ class TreeNode extends PureComponent {
           selectable={selectable}
           hint={hint}
           nodeMode={nodeMode}
+          radioGroup={radioGroup}
         />
         <Actions actions={actions} onAction={onAction} id={_id} readOnly={readOnly} />
       </li>
