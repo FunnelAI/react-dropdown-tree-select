@@ -152,7 +152,7 @@ class Tree extends Component {
             next={this.loadMore}
             hasMore={this.hasMore()}
             loader={<span className="searchLoader">Loading...</span>}
-            scrollableTarget={this.state.scrollableTarget}
+            scrollableTarget={false}
           >
             {this.state.items}
           </InfiniteScroll>

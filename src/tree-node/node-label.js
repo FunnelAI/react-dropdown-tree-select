@@ -5,7 +5,7 @@ import Checkbox from '../checkbox'
 import RadioButton from '../radio'
 
 import styles from './index.css'
-
+import 'balloon-css'
 const cx = cn.bind(styles)
 
 class NodeLabel extends PureComponent {
@@ -64,7 +64,8 @@ class NodeLabel extends PureComponent {
     const { mode, title, label, id, partial, checked, selectable = true, nodeMode } = this.props
     const { value, disabled, showPartiallySelected, readOnly, clientId, radioGroup } = this.props
     const { hint } = this.props
-    const nodeLabelProps = { className: `node-label ${hint ? 'tooltip' : ''}` }
+    // const nodeLabelProps = { className: `node-label ${hint ? 'tooltip' : ''}` }
+    const nodeLabelProps = { className: 'node-label' }
     const labelProps = { className: selectable ? '' : 'not_selectable' }
     // in case of simple select mode, there is no checkbox, so we need to handle the click via the node label
     // but not if the control is in readOnly or disabled state
@@ -108,9 +109,8 @@ class NodeLabel extends PureComponent {
             />
           )
         )} */}
-        <span {...nodeLabelProps}>
+        <span {...nodeLabelProps} data-balloon-length="large" aria-label={hint} data-balloon-pos="right">
           {label}
-          <span className="tooltiptext">{hint}</span>
         </span>
       </label>
     )
