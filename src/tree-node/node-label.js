@@ -24,14 +24,15 @@ class NodeLabel extends PureComponent {
     onCheckboxChange: PropTypes.func,
     readOnly: PropTypes.bool,
     clientId: PropTypes.string,
-    selectable: PropTypes.bool,
+    not_selectable: PropTypes.bool,
     hint: PropTypes.string,
     nodeMode: PropTypes.oneOf(['radioSelect']),
     radioGroup: PropTypes.string,
+    getNodeById: PropTypes.func,
   }
 
   handleCheckboxChange = e => {
-    const { mode, id, onCheckboxChange, nodeMode } = this.props
+    const { mode, id, onCheckboxChange, nodeMode, getNodeById } = this.props
 
     if (mode === 'simpleSelect' || mode === 'radioSelect' || nodeMode === 'radioSelect') {
       onCheckboxChange(id, true)
@@ -46,13 +47,19 @@ class NodeLabel extends PureComponent {
   }
 
   handleRadioButtonChange = e => {
-    const { id, onCheckboxChange } = this.props
+    const { id, onCheckboxChange, getNodeById } = this.props
     const { target } = e
     // has to be a radio button of the same group that is not checked:
     const tagsToClose = document.querySelectorAll(`input[type='radio'][name='${target.name}']:not(:checked)`)
     tagsToClose.forEach(tagToClose => {
       const tagCloseButton = document.querySelector(`button#${tagToClose.id}_button.tag-remove`)
       // if there is a result just close the tag from the close button
+      // const node_ = getNodeById(tagToClose.id)
+      // if (node_.isDefaultValue) {
+      //   //if clicking away from default, don't close it, just hide it
+      //   const tag = document.querySelector(`#${node_._id}_tag`)
+      //   if (tag) tag.classList.toggle('hidden')
+      // } else if (tagToClose && tagCloseButton) tagCloseButton.click()
       if (tagToClose && tagCloseButton) tagCloseButton.click()
     })
     // And create the new tag
@@ -61,15 +68,15 @@ class NodeLabel extends PureComponent {
     e.nativeEvent.stopImmediatePropagation()
   }
   render() {
-    const { mode, title, label, id, partial, checked, selectable = true, nodeMode } = this.props
+    const { mode, title, label, id, partial, checked, not_selectable = false, nodeMode } = this.props
     const { value, disabled, showPartiallySelected, readOnly, clientId, radioGroup } = this.props
     const { hint } = this.props
     // const nodeLabelProps = { className: `node-label ${hint ? 'tooltip' : ''}` }
     const nodeLabelProps = { className: 'node-label' }
-    const labelProps = { className: selectable ? '' : 'not_selectable' }
+    const labelProps = { className: not_selectable ? 'not_selectable' : '' }
     // in case of simple select mode, there is no checkbox, so we need to handle the click via the node label
     // but not if the control is in readOnly or disabled state
-    const shouldRegisterClickHandler = mode === 'simpleSelect' && !readOnly && !disabled && selectable
+    const shouldRegisterClickHandler = mode === 'simpleSelect' && !readOnly && !disabled && !not_selectable
 
     if (shouldRegisterClickHandler) {
       nodeLabelProps.onClick = this.handleCheckboxChange
@@ -79,7 +86,7 @@ class NodeLabel extends PureComponent {
 
     return (
       <label title={title || label} htmlFor={id} {...labelProps}>
-        {selectable &&
+        {!not_selectable &&
           (mode === 'radioSelect' || nodeMode === 'radioSelect' ? (
             <RadioButton
               name={radioGroup || clientId}
