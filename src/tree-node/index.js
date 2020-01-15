@@ -73,10 +73,12 @@ class TreeNode extends PureComponent {
     showPartiallySelected: PropTypes.bool,
     readOnly: PropTypes.bool,
     clientId: PropTypes.string,
-    selectable: PropTypes.bool,
+    not_selectable: PropTypes.bool,
     hint: PropTypes.string,
     nodeMode: PropTypes.oneOf(['radioSelect']),
     radioGroup: PropTypes.string,
+    getNodeById: PropTypes.func,
+    defaults: PropTypes.bool,
   }
 
   getAriaAttributes = () => {
@@ -93,7 +95,26 @@ class TreeNode extends PureComponent {
     }
     return attributes
   }
-
+  componentDidMount() {
+    const { getNodeById, _id, defaults } = this.props
+    const currentNode = getNodeById(_id)
+    const { selected_by_default, _parent, not_selectable, expanded } = currentNode
+    const siblings = _parent ? getNodeById(_parent)._children.filter(id => id !== _id) : null
+    if (not_selectable) {
+      if (siblings && siblings.length === 0) {
+        const elem = document.querySelector(`li#${_id}_li>i`)
+        // if (elem && !expanded) elem.click()
+        if (elem) elem.click()
+      }
+    } else {
+      const siblings_selected = siblings ? siblings.some(id => getNodeById(id).checked) : null
+      if (selected_by_default && defaults && !siblings_selected) {
+        console.log({ currentNode })
+        const elem = document.querySelector(`input#${_id}:not(:checked)`)
+        if (elem) elem.click()
+      }
+    }
+  }
   render() {
     const {
       mode,
@@ -117,10 +138,11 @@ class TreeNode extends PureComponent {
       showPartiallySelected,
       readOnly,
       clientId,
-      selectable,
+      not_selectable,
       hint,
       nodeMode,
       radioGroup,
+      getNodeById,
     } = this.props
     const liCx = getNodeCx(this.props)
     const style = keepTreeOnSearch || !searchModeOn ? { paddingLeft: `${(_depth || 0) * 20}px` } : {}
@@ -129,7 +151,13 @@ class TreeNode extends PureComponent {
 
     return (
       <li className={liCx} style={style} id={liId} {...getDataset(dataset)} {...this.getAriaAttributes()}>
-        <Toggle isLeaf={isLeaf(_children)} expanded={expanded} id={_id} onNodeToggle={onNodeToggle} />
+        <Toggle
+          isLeaf={isLeaf(_children)}
+          expanded={expanded}
+          id={_id}
+          onNodeToggle={onNodeToggle}
+          getNodeById={getNodeById}
+        />
         <NodeLabel
           title={title}
           label={label}
@@ -143,10 +171,11 @@ class TreeNode extends PureComponent {
           showPartiallySelected={showPartiallySelected}
           readOnly={readOnly}
           clientId={clientId}
-          selectable={selectable}
+          not_selectable={not_selectable}
           hint={hint}
           nodeMode={nodeMode}
           radioGroup={radioGroup}
+          getNodeById={getNodeById}
         />
         <Actions actions={actions} onAction={onAction} id={_id} readOnly={readOnly} />
       </li>
