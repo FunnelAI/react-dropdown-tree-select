@@ -48,6 +48,7 @@ class DropdownTreeSelect extends Component {
     readOnly: PropTypes.bool,
     id: PropTypes.string,
     searchPredicate: PropTypes.func,
+    defaults: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -276,13 +277,13 @@ class DropdownTreeSelect extends Component {
   }
 
   render() {
-    const { disabled, readOnly, mode, texts } = this.props
+    const { disabled, readOnly, mode, texts, defaults } = this.props
     const { showDropdown, currentFocus, tags } = this.state
 
     const activeDescendant = currentFocus ? `${currentFocus}_li` : undefined
 
     const commonProps = { disabled, readOnly, activeDescendant, texts, mode, clientId: this.clientId }
-
+    const { getNodeById } = this.treeManager
     return (
       <div
         id={this.clientId}
@@ -328,6 +329,8 @@ class DropdownTreeSelect extends Component {
                   mode={mode}
                   showPartiallySelected={this.props.showPartiallySelected}
                   {...commonProps}
+                  getNodeById={id => this.treeManager.getNodeById(id)}
+                  defaults={defaults}
                 />
               )}
             </div>
