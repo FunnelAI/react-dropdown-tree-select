@@ -199,6 +199,7 @@ class DropdownTreeSelect extends Component {
     this.setState(nextState, () => {
       callback && callback(tags)
     })
+    // const getNodeById = id => this.treeManager.getNodeById(id)
     this.props.onChange(this.treeManager.getNodeById(id), tags)
   }
 
