@@ -12,6 +12,7 @@ class Toggle extends PureComponent {
     onNodeToggle: PropTypes.func,
     id: PropTypes.string,
     getNodeById: PropTypes.func,
+    not_selectable: PropTypes.bool,
   }
 
   onToggle = e => {
@@ -29,9 +30,10 @@ class Toggle extends PureComponent {
 
   render() {
     const { expanded, isLeaf } = this.props
+    // const node = getNodeById(this.props.id)
+    // if (isLeaf || (node._children && !not_selectable)) return null
     if (isLeaf) return null
-
-    const toggleCx = cx('toggle', { expanded, collapsed: !expanded })
+    const toggleCx = cx(`toggle`, { expanded, collapsed: !expanded })
     return (
       <i
         role="button"
