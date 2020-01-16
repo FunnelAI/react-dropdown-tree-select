@@ -98,20 +98,57 @@ class TreeNode extends PureComponent {
   componentDidMount() {
     const { getNodeById, _id, defaults } = this.props
     const currentNode = getNodeById(_id)
-    const { selected_by_default, _parent, not_selectable, expanded } = currentNode
-    const siblings = _parent ? getNodeById(_parent)._children.filter(id => id !== _id) : null
-    if (not_selectable) {
-      if (siblings && siblings.length === 0) {
-        const elem = document.querySelector(`li#${_id}_li>i`)
-        // if (elem && !expanded) elem.click()
-        if (elem) elem.click()
-      }
-    } else {
-      const siblings_selected = siblings ? siblings.some(id => getNodeById(id).checked) : null
-      if (selected_by_default && defaults && !siblings_selected) {
-        console.log({ currentNode })
-        const elem = document.querySelector(`input#${_id}:not(:checked)`)
-        if (elem) elem.click()
+    const { _parent, checked_, not_selectable } = currentNode
+    const selectable = !not_selectable
+    // const siblings = _parent ? getNodeById(_parent)._children.filter(id => id !== _id) : null
+    // if (not_selectable) {
+    //   if (siblings && siblings.length === 0) {
+    //     const elem = document.querySelector(`li#${_id}_li>i`)
+    //     // if (elem && !expanded) elem.click()
+    //     if (elem) elem.click()
+    //   }
+    // } else {
+    //   const siblings_selected = siblings ? siblings.some(id => getNodeById(id).checked) : null
+    //   if (selected_by_default && defaults && !siblings_selected) {
+    //     console.log({ currentNode })
+    //     const elem = document.querySelector(`input#${_id}:not(:checked)`)
+    //     if (elem) elem.click()
+    //   }
+    // }
+    // if(not_selectable){
+    //   const elem = document.querySelector(`li#${_id}_li>i`)
+    //    // if (elem && !expanded) elem.click()
+    //   if (elem) elem.click()
+    // }
+    if (selectable) {
+      if (defaults) {
+        //not labeled
+        const parent = _parent ? getNodeById(_parent) : null
+        const _ancestor = parent ? parent._parent : null
+        const ancestor = _ancestor ? getNodeById(_ancestor) : null
+        if (ancestor) {
+          if (ancestor.checked) {
+            // If ancestor is checked and current is selected by default
+            // select it
+            if (currentNode.selected_by_default) {
+              const elem = document.querySelector(`input#${_id}:not(:checked)`)
+              if (elem) elem.click()
+            }
+          }
+        } else if (currentNode.selected_by_default) {
+          //If there is no ancestor that means we are the top level (think auto)
+          //if selected_by default select it.
+          const elem = document.querySelector(`input#${_id}:not(:checked)`)
+          if (elem) elem.click()
+        }
+      } else {
+        //labeled
+        //// If it's labeled it should come already checked
+        //If it's labeled we should only check the input if it's checked_ (that is from the db)
+        // if (checked_) {
+        //   const elem = document.querySelector(`input#${_id}:not(:checked)`)
+        //   if (elem) elem.click()
+        // }
       }
     }
   }
@@ -157,6 +194,7 @@ class TreeNode extends PureComponent {
           id={_id}
           onNodeToggle={onNodeToggle}
           getNodeById={getNodeById}
+          not_selectable={not_selectable}
         />
         <NodeLabel
           title={title}
