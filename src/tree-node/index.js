@@ -145,10 +145,12 @@ class TreeNode extends PureComponent {
         //labeled
         //// If it's labeled it should come already checked
         //If it's labeled we should only check the input if it's checked_ (that is from the db)
-        // if (checked_) {
-        //   const elem = document.querySelector(`input#${_id}:not(:checked)`)
-        //   if (elem) elem.click()
-        // }
+        const siblings = _parent ? getNodeById(_parent)._children.filter(id => id !== _id) : null
+        const siblings_selected = siblings ? siblings.some(id => getNodeById(id).checked) : null
+        if (currentNode.selected_by_default && !siblings_selected) {
+          const elem = document.querySelector(`input#${_id}:not(:checked)`)
+          if (elem) elem.click()
+        }
       }
     }
   }
